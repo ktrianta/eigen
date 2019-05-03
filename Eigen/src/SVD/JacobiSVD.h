@@ -572,6 +572,10 @@ template<typename _MatrixType, int QRPreconditioner> class JacobiSVD
       return compute(matrix, m_computationOptions);
     }
 
+    size_t getSweeps() const {
+        return sweeps;
+    }
+
     using Base::computeU;
     using Base::computeV;
     using Base::rows;
@@ -579,6 +583,7 @@ template<typename _MatrixType, int QRPreconditioner> class JacobiSVD
     using Base::rank;
 
   private:
+    size_t sweeps;
     void allocate(Index rows, Index cols, unsigned int computationOptions);
 
   protected:
@@ -697,6 +702,7 @@ JacobiSVD<MatrixType, QRPreconditioner>::compute(const MatrixType& matrix, unsig
   /*** step 2. The main Jacobi SVD iteration. ***/
   RealScalar maxDiagEntry = m_workMatrix.cwiseAbs().diagonal().maxCoeff();
 
+  sweeps = 0;
   bool finished = false;
   while(!finished)
   {
@@ -735,6 +741,8 @@ JacobiSVD<MatrixType, QRPreconditioner>::compute(const MatrixType& matrix, unsig
         }
       }
     }
+
+    sweeps += 1;
   }
 
   /*** step 3. The work matrix is now diagonal, so ensure it's positive so its diagonal entries are the singular values ***/
